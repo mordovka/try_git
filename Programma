@@ -1,3 +1,104 @@
-#include <iostream.h>
-using namespace std;
-int tmain
+#include "stdafx.h"
+struct List
+{
+  int N;
+	List *pNext;
+};
+
+// Добавить элемент в начало списка
+void add(List *&pF, List *p) 
+{
+	p->pNext=pF;
+	pF=p;
+}
+
+// Извлечь элемент из начала списка
+List * del(List *&pF)
+{
+	if (pF==0) return 0;
+	List *p=pF;
+	pF=pF->pNext;
+	return p;
+}
+
+// Извлечь элемент p из списка
+List *delP(List * &pF, List *p)
+{
+	if (pF==0 || p==0) return 0;
+	if (p==pF)
+	{
+		pF=pF->pNext;
+		return p;
+	}
+	// Ищем адрес предыдущего элеемнта перед p
+	List *pPred=pF;
+	while(pPred->pNext!=p)
+	{
+		pPred=pPred->pNext;
+		if (pPred==0) return 0; // Если элемента p нет в списке
+	}
+	pPred->pNext=p->pNext;
+	return p;
+}
+
+// Элемент p вставить в любое место списка до заданного элемента p2
+void insert(List *&pF, List *p2, List *p)
+{
+	// Элемент p вставляем перед элементов p2
+	p->pNext=p2;
+	if (pF==p2) // Вставить перед первым элементом
+	{
+		pF=p; // Элемент становится первым
+		return;
+	}
+	// Ищем адрес предыдущего элеемнта перед p
+	List *pPred=pF;
+	while(pPred->pNext!=p)
+	{
+		pPred=pPred->pNext;
+		if (pPred==0) return; // Если элемента p нет в списке
+	}
+	pPred->pNext=p;
+}
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	List *pF=0, *p;
+	for(int i=1; i<11; i++)
+	{
+		p=new List;
+		p->N=i;
+		add(pF, p);
+	}
+	// Печать списка
+	for(p=pF; p; p=p->pNext)
+		printf("%4d", p->N);
+	// Сортировка списка методом вставки
+	List *pi=pF->pNext; // Начинаем со второго элемента
+	while(pi)
+	{
+		List *ppi=pi->pNext; // Сохраняем след элемент за pi
+		// Элемент pi вставляем в уже отсортированный массив
+		List *pj=pF;
+		while(pj!=pi)
+		{
+			if (pj->N>pi->N) // pi вставить перед pj
+			{
+				delP(pF, pi); // Исключаем pi из списка
+				insert(pF, pj, pi); // Вставляем pi перед pj
+				break;
+			}
+		}
+		pi=ppi;
+	}
+
+	printf("\n\n\n");
+
+	// Печать списка
+	for(p=pF; p; p=p->pNext)
+		printf("%4d", p->N);
+	return 0;
+}
+
